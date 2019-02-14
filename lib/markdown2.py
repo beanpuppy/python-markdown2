@@ -1492,18 +1492,16 @@ class Markdown(object):
         """Turn curly braces {} into an <iframe>.
         This is not correct markdown, but whatever man.
         """
-        options = self.extras.get('iframes')
+        options = self.extras.get('iframes') or {}
+        width = options.get('width')
+        height = options.get('height')
+
         reg = r'\{(.*?)\}'
 
-        if options:
-            width = options.get('width')
-            height = options.get('height')
-            rep = r'<iframe %s %s src="\1"></iframe>' % (
-                'width="' + width + '"' if width else '',
-                'height="' +  height + '"' if height else '',
-            )
-        else:
-            rep = r'<iframe src="\1"></iframe>'
+        rep = r'<iframe %s %s src="\1"></iframe>' % (
+            'width="' + width + '"' if width else '',
+            'height="' +  height + '"' if height else '',
+        )
 
         text = re.sub(reg, rep, text)
 
