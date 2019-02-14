@@ -398,6 +398,9 @@ class Markdown(object):
             if self.cli:
                 text = '{}\n{}'.format(self._toc_html, text)
 
+        if "iframes" in self.extras:
+            text = self._do_iframes(text)
+
         text += "\n"
 
         # Attach attrs to output
@@ -408,6 +411,7 @@ class Markdown(object):
 
         if "metadata" in self.extras:
             rv.metadata = self.metadata
+
         return rv
 
     def postprocess(self, text):
@@ -1484,6 +1488,27 @@ class Markdown(object):
 
         return text
 
+    def _do_iframes(self, text):
+        """Turn curly braces {} into an <iframe>.
+        This is not correct markdown, but whatever man.
+        """
+        options = self.extras.get('iframes')
+        reg = r'\{(.*?)\}'
+
+        if options:
+            width = options.get('width')
+            height = options.get('height')
+            rep = r'<iframe %s %s src="\1"></iframe>' % (
+                'width="' + width + '"' if width else '',
+                'height="' +  height + '"' if height else '',
+            )
+        else:
+            rep = r'<iframe src="\1"></iframe>'
+
+        text = re.sub(reg, rep, text)
+
+        return text
+
     def header_id_from_text(self, text, prefix, n):
         """Generate a header id attribute value from the given header
         HTML content.
@@ -1772,7 +1797,7 @@ class Markdown(object):
                 lexer_name = lexer_name[3:].strip()
                 codeblock = rest.lstrip("\n")   # Remove lexer declaration line.
                 formatter_opts = self.extras['code-color'] or {}
-        
+
         # Use pygments only if not using the highlightjs-lang extra
         if lexer_name and "highlightjs-lang" not in self.extras:
             def unhash_code(codeblock):
@@ -2146,7 +2171,7 @@ class Markdown(object):
     def _encode_incomplete_tags(self, text):
         if self.safe_mode not in ("replace", "escape"):
             return text
-            
+
         return self._incomplete_tags_re.sub("&lt;\\1", text)
 
     def _encode_backslash_escapes(self, text):
