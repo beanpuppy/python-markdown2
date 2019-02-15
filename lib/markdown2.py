@@ -1496,14 +1496,18 @@ class Markdown(object):
         width = options.get('width')
         height = options.get('height')
 
+        # Replace {} with iframes
         reg = r'(?<!\\)\{(.+?)\}'
-
         rep = r'<iframe %s %s src="\1"></iframe>' % (
             'width="' + width + '"' if width else '',
             'height="' +  height + '"' if height else '',
         )
 
         text = re.sub(reg, rep, text)
+
+        # Replace \{} with {} because I don't know how to get rid of them right now
+        reg = r'\\\{(.+?)\}'
+        text = re.sub(reg, r'{\1}', text)
 
         return text
 
