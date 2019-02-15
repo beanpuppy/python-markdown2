@@ -348,6 +348,9 @@ class Markdown(object):
 
         text = self.preprocess(text)
 
+        if "iframes" in self.extras:
+            text = self._do_iframes(text)
+
         if "fenced-code-blocks" in self.extras and not self.safe_mode:
             text = self._do_fenced_code_blocks(text)
 
@@ -397,9 +400,6 @@ class Markdown(object):
             # Prepend toc html to output
             if self.cli:
                 text = '{}\n{}'.format(self._toc_html, text)
-
-        if "iframes" in self.extras:
-            text = self._do_iframes(text)
 
         text += "\n"
 
@@ -1496,7 +1496,7 @@ class Markdown(object):
         width = options.get('width')
         height = options.get('height')
 
-        reg = r'\{(.*?)\}'
+        reg = r'(?<!\\)\{(.+?)\}'
 
         rep = r'<iframe %s %s src="\1"></iframe>' % (
             'width="' + width + '"' if width else '',
