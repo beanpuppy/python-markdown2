@@ -2245,6 +2245,11 @@ class Markdown(object):
                 if text[start - 2:start] == '](' or text[end:end + 2] == '")':
                     continue
 
+                # Do not match against links which are escaped.
+                if text[start - 3:start] == '"""' and text[end:end + 3] == '"""':
+                    text = text[:start - 3] + text[start:end] + text[end + 3:]
+                    continue
+
                 escaped_href = (
                     href.replace('"', '&quot;')  # b/c of attr quote
                         # To avoid markdown <em> and <strong>:
