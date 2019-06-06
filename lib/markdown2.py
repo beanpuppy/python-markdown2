@@ -96,7 +96,7 @@ see <https://github.com/trentm/python-markdown2/wiki/Extras> for details):
 #   not yet sure if there implications with this. Compare 'pydoc sre'
 #   and 'perldoc perlre'.
 
-__version_info__ = (2, 3, 8)
+__version_info__ = (2, 3, 9)
 __version__ = '.'.join(map(str, __version_info__))
 __author__ = "Trent Mick"
 
@@ -1682,7 +1682,7 @@ class Markdown(object):
         re.M | re.X | re.S)
 
     _task_list_item_re = re.compile(r'''
-        (\[[\ x]\])[ \t]+       # tasklist marker = \1
+        (\[[\ xX]\])[ \t]+       # tasklist marker = \1
         (.*)                   # list item text = \2
     ''', re.M | re.X | re.S)
 
@@ -1691,7 +1691,7 @@ class Markdown(object):
     def _task_list_item_sub(self, match):
         marker = match.group(1)
         item_text = match.group(2)
-        if marker == '[x]':
+        if marker in ['[x]','[X]']:
                 return self._task_list_warpper_str % ('checked ', item_text)
         elif marker == '[ ]':
                 return self._task_list_warpper_str % ('', item_text)
@@ -2100,7 +2100,7 @@ class Markdown(object):
 
                 # Wrap <p> tags.
                 graf = self._run_span_gamut(graf)
-                grafs.append("<p>" + graf.lstrip(" \t") + "</p>")
+                grafs.append("<p%s>" % self._html_class_str_from_tag('p') + graf.lstrip(" \t") + "</p>")
 
                 if cuddled_list:
                     grafs.append(cuddled_list)
